@@ -18,12 +18,13 @@ def extract_sections_from_resume(resume_text):
 
     prompt = f"""
             Extract the following sections from this resume text and return clean JSON:
-        1. Projects
-        2. Technical Skills
-        3. Experience / Achievements
-        4. Education
-        5. Leadership (if available)
-        6. Certifications
+        1. Name
+        2. Projects
+        3. Technical Skills
+        4. Experience / Achievements
+        5. Education
+        6. Leadership (if available)
+        7. Certifications
 
         Resume text: {resume_text}
     """
