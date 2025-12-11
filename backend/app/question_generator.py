@@ -1,8 +1,23 @@
 from groq import Groq
 import json
 import os
+import re
+from typing import List, Dict, Any
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+def _safe_json(text: str) -> Dict[str, Any]:
+    """Try to pull a JSON object from an LLM response; fall back to plain dict."""
+    try:
+        cleaned = re.sub(r"```json|```", "", text).strip()
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start != -1 and end != -1:
+            cleaned = cleaned[start : end + 1]
+        return json.loads(cleaned)
+    except Exception:
+        return {}
+
 
 def generate_interview_question(resume_json):
     prompt = f"""
@@ -38,23 +53,35 @@ Generate a follow-up question. Keep it short.
     return response.choices[0].message.content
 
 
-def generate_interview_feedback(history):
+def generate_interview_feedback(history: List[Dict[str, str]]):
     prompt = f"""
-Provide final interview feedback based on this conversation:
-
+You are evaluating a mock interview. Conversation history:
 {json.dumps(history, indent=2)}
 
-Include:
-- Strengths
-- Weaknesses
-- Technical skills assessment
-- Communication assessment
-- Suggestions to improve
+Return STRICT JSON with:
+{{
+  "overallScore": number 0-100,
+  "evaluation": string,
+  "strengths": [string],
+  "weaknesses": [string],
+  "suggestions": [string]
+}}
 
-Keep the feedback polite and concise.
+Score by comparing the user's answers to the questions, focusing on correctness, clarity, and evidence (metrics/examples). Keep texts concise.
 """
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}]
     )
-    return response.choices[0].message.content
+    parsed = _safe_json(response.choices[0].message.content)
+
+    # Fallback defaults if parsing failed
+    if not parsed:
+        parsed = {
+            "overallScore": 60,
+            "evaluation": "Conversation captured, but structured feedback parsing failed.",
+            "strengths": [],
+            "weaknesses": [],
+            "suggestions": ["Try again or check the LLM response format."],
+        }
+    return parsed
