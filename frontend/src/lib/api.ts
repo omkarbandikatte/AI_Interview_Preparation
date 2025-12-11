@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "https://ai-interview-preparation-paj9.onrender.com";
 
 async function postEvent<T>(event: string, data?: Record<string, unknown>): Promise<T> {
   const res = await fetch(`${API_BASE}/vapi-webhook`, {
