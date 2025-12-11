@@ -21,7 +21,7 @@ app.add_middleware(
 )
 
 # Create upload directory
-UPLOAD_DIR = os.path.join("uploads")
+UPLOAD_DIR = "/tmp/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
