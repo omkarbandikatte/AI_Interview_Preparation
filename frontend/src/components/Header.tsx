@@ -14,7 +14,7 @@ export function Header() {
             <Brain className="w-6 h-6 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">InterviewAI</h1>
+            <h1 className="text-xl font-bold text-foreground">JobSathi</h1>
             <p className="text-xs text-muted-foreground">Your AI Interview Coach</p>
           </div>
         </div>
